@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config(); // 🔥 this must come before using process.env
+dotenv.config();
 
 import { Server } from 'http';
 import app from './app';
