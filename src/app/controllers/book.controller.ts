@@ -26,20 +26,21 @@ export const getAllBooks = async (
   next: NextFunction
 ) => {
   try {
-    const {
-      filter,
-      sortBy = "createdAt",
-      sort = "asc",
-      limit = 10,
-    } = req.query;
+    const { filter, sort = "asc", limit = "10" } = req.query;
+
     const query: any = {};
     if (filter) {
       query.genre = filter;
     }
-    const sortOrder = sort === "asc" ? 1 : -1;
+
+    const parsedLimit = Math.min(parseInt(limit as string) || 10, 100);
+    const sortOrder = sort === "desc" ? -1 : 1;
+
     const books = await Book.find(query)
-      .sort({ [sortBy as string]: sortOrder })
-      .limit(Number(limit));
+      .sort({ createdAt: sortOrder })
+      .limit(parsedLimit)
+      .select("-__v");
+
     res.status(200).json({
       success: true,
       message: "Books retrieved successfully",
@@ -96,11 +97,20 @@ export const deleteBook = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const bookId = req.params.bookId;
 
-    const book = await Book.findByIdAndDelete(bookId);
+    const book = await Book.findById(bookId);
+    if (!book) {
+      const error = new Error(`Book with id ${bookId} not found`);
+      (error as any).status = 404;
+      (error as any).name = "NotFoundError";
+      return next(error);
+    }
+
+    await book.deleteOne();
+
     res.status(200).json({
       success: true,
       message: "Book deleted successfully",
