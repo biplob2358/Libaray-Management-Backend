@@ -7,7 +7,7 @@ A RESTful API built with **Node.js**, **Express**, **TypeScript**, and **MongoDB
 
 - **GitHub Repository Link:** [GitHub Repository](https://github.com/biplob2358/Libaray-Management-Backend)
 - **Live Deployment Link:** [Live Site](https://libaray-management-server.vercel.app/)
-- **Video Explanation (Public Link):** [Video Explanation](https://commingsoon)
+- **Video Explanation (Public Link):** [Video Explanation](https://www.youtube.com/watch?v=kzMaYzvkGo8)
 
 ---
 
