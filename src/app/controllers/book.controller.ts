@@ -26,7 +26,7 @@ export const getAllBooks = async (
   next: NextFunction
 ) => {
   try {
-    const { filter, sort = "asc", limit = "10" } = req.query;
+    const { filter, sort = "asc", limit = "10", page = "1" } = req.query;
 
     const query: any = {};
     if (filter) {
@@ -34,17 +34,26 @@ export const getAllBooks = async (
     }
 
     const parsedLimit = Math.min(parseInt(limit as string) || 10, 100);
+    const parsedPage = Math.max(parseInt(page as string) || 1, 1);
+    const skip = (parsedPage - 1) * parsedLimit;
     const sortOrder = sort === "desc" ? -1 : 1;
 
-    const books = await Book.find(query)
-      .sort({ createdAt: sortOrder })
-      .limit(parsedLimit)
-      .select("-__v");
+    const [total, books] = await Promise.all([
+      Book.countDocuments(query),
+      Book.find(query)
+        .sort({ createdAt: sortOrder })
+        .skip(skip)
+        .limit(parsedLimit)
+        .select("-__v"),
+    ]);
 
     res.status(200).json({
       success: true,
       message: "Books retrieved successfully",
       data: books,
+      total,
+      page: parsedPage,
+      limit: parsedLimit,
     });
   } catch (error) {
     next(error);
