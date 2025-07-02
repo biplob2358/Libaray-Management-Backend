@@ -129,3 +129,23 @@ export const deleteBook = async (
     next(error);
   }
 };
+export const getRecentBooks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const recentBooks = await Book.find()
+      .sort({ createdAt: -1 }) // Newest first
+      .limit(5)
+      .select("-__v");
+
+    res.status(200).json({
+      success: true,
+      message: "Recent books retrieved successfully",
+      data: recentBooks,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
